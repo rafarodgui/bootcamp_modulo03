@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { FaGithubAlt, FaPlus, FaSpinner } from 'react-icons/fa';
-import { Container, Form, SubmitButton, Result } from './styles';
+import { Container, Form, SubmitButton, List } from './styles';
 
 import api from '../../services/api';
 
@@ -11,6 +11,24 @@ class Main extends Component {
         repositories: [],
         loading: false
     };
+
+    // carregar dados no local storage
+    componentDidMount() {
+        const repositories = localStorage.getItem('repositories');
+
+        if (repositories) {
+            this.setState({ repositories: JSON.parse(repositories) });
+        }
+    }
+
+    // armazernar dados no localstorage
+    componentDidUpdate(_, prevState) {
+        const { repositories } = this.state;
+
+        if (prevState.repositories !== repositories) {
+            localStorage.setItem('repositories', JSON.stringify(repositories));
+        }
+    }
 
     handleInputChange = e => {
         this.setState({
@@ -36,12 +54,10 @@ class Main extends Component {
             newRepo: '',
             loading: false
         });
-
-        console.log(repositories);
     };
 
     render() {
-        const { newRepo, loading } = this.state;
+        const { newRepo, loading, repositories } = this.state;
 
         return (
             <Container>
@@ -65,6 +81,16 @@ class Main extends Component {
                         )}
                     </SubmitButton>
                 </Form>
+                <List>
+                    {repositories.map(repository => (
+                        <li key={repository.name}>
+                            <span>{repository.name}</span>
+                            <a href={repository.html_url} target="blank">
+                                Detalhes
+                            </a>
+                        </li>
+                    ))}
+                </List>
             </Container>
         );
     }
