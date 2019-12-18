@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import { Link } from 'react-router-dom';
+
 import { FaGithubAlt, FaPlus, FaSpinner } from 'react-icons/fa';
 import { Container, Form, SubmitButton, List } from './styles';
 
@@ -85,9 +87,14 @@ class Main extends Component {
                     {repositories.map(repository => (
                         <li key={repository.name}>
                             <span>{repository.name}</span>
-                            <a href={repository.html_url} target="blank">
+                            <Link
+                                to={`/repository/${encodeURIComponent(
+                                    repository.name
+                                )}`}
+                                loading={loading}
+                            >
                                 Detalhes
-                            </a>
+                            </Link>
                         </li>
                     ))}
                 </List>
