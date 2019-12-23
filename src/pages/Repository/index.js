@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import { Link } from 'react-router-dom';
+
 import { FaSpinner } from 'react-icons/fa';
 
-import { Loading } from './styles';
+import { Owner, Loading, IssuesList } from './styles';
+import Container from '../../components/container/index';
 
 import api from '../../services/api';
 
@@ -49,15 +52,41 @@ export default class Repository extends Component {
 
         if (loading) {
             return (
-                <>
-                    <Loading>
-                        Carregando
-                        <FaSpinner size={20} loading={loading} />
-                    </Loading>
-                </>
+                <Loading>
+                    Carregando
+                    <FaSpinner size={20} loading={loading} />
+                </Loading>
             );
         }
 
-        return <h1>Repository:</h1>;
+        return (
+            <Container>
+                <Owner>
+                    <Link to="/">Voltar aos repositórios</Link>
+                    <img src={repository.owner.avatar_url} alt={repository.owner.login}/>
+                    <h1>{repository.name}</h1>
+                    <p>{repository.description}</p>
+                </Owner>
+
+                <IssuesList>
+                    {issues.map(issue => (
+                        <li key={String(issue.id)}>
+                            <img src={issue.user.avatar_url} alt={issue.user.login}/>
+                            <div>
+                                <strong>
+                                    <a href={issue.html_url} target="blank">{issue.title}</a>
+                                    {issue.labels.map(label => (
+                                        <span key={String(label.id)}>
+                                            {label.name}
+                                        </span>
+                                    ))}
+                                </strong>
+                                <p>{issue.user.login}</p>
+                            </div>
+                        </li>
+                    ))}
+                </IssuesList>
+            </Container>
+        );
     }
 }

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
 import { FaGithubAlt, FaPlus, FaSpinner } from 'react-icons/fa';
-import { Container, Form, SubmitButton, List } from './styles';
+import { Container, Form, SubmitButton, List, Error } from './styles';
 
 import api from '../../services/api';
 
@@ -11,7 +11,9 @@ class Main extends Component {
     state = {
         newRepo: '',
         repositories: [],
-        loading: false
+        loading: false,
+        error: false,
+        errMsg: ''
     };
 
     // carregar dados no local storage
@@ -40,26 +42,38 @@ class Main extends Component {
 
     handleSubmit = async e => {
         e.preventDefault();
-
         this.setState({ loading: true });
 
-        const { newRepo, repositories } = this.state;
+        try {
+            const { newRepo, repositories } = this.state;
 
-        const response = await api.get(`/repos/${newRepo}`);
+            if (repositories.indexOf(newRepo)) {
+                throw new Error();
+            }
 
-        const data = {
-            name: response.data.full_name
-        };
+            const response = await api.get(`/repos/${newRepo}`);
 
-        this.setState({
-            repositories: [...repositories, data],
-            newRepo: '',
-            loading: false
-        });
+            const data = {
+                name: response.data.full_name
+            };
+
+            this.setState({
+                repositories: [...repositories, data],
+                newRepo: '',
+                loading: false,
+                error: false
+            });
+        } catch {
+            this.setState({
+                error: true,
+                loading: false,
+                errMsg: 'verifique os dados e tente novamente'
+            });
+        }
     };
 
     render() {
-        const { newRepo, loading, repositories } = this.state;
+        const { newRepo, loading, repositories, error, errMsg } = this.state;
 
         return (
             <Container>
@@ -68,7 +82,7 @@ class Main extends Component {
                     Repositórios
                 </h1>
 
-                <Form onSubmit={this.handleSubmit}>
+                <Form onSubmit={this.handleSubmit} error={error}>
                     <input
                         type="text"
                         placeholder="adicionar repositório"
@@ -83,6 +97,7 @@ class Main extends Component {
                         )}
                     </SubmitButton>
                 </Form>
+                <Error>{errMsg}</Error>
                 <List>
                     {repositories.map(repository => (
                         <li key={repository.name}>

@@ -26,7 +26,8 @@ export const Form = styled.form`
         padding: 10px 15px;
         border-radius: 4px;
         font-size: 16px;
-        border: 1px solid #ddd;
+        border: ${props =>
+            props.error ? '1.5px solid #b00000' : '1px solid #eee'};
     }
 `;
 
@@ -95,4 +96,10 @@ export const List = styled.ul`
             color: #7159c1;
         }
     }
+`;
+
+export const Error = styled.p`
+    margin-top: 5px;
+    font-size: 14px;
+    color: #b00;
 `;
